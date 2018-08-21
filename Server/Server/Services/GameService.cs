@@ -6,21 +6,11 @@ namespace Server.Services
 {
     public class GameService : IGameService
     {
-        private Location[] locations;
-        private Hans[] hanses;
-        
+        public Location[] Locations { get; set; }
+        public Hans[] Hanses { get; set; }
+
         public GameService()
         {
-            locations = new[]
-            {
-                new Location("Home", new[] {Bed}),
-                new Location("Restaurant", new[] {Table})
-            };
-            
-            var hans1 = new Hans("Peter");
-            var hans2 = new Hans("Rudolf");
-
-            hanses = new[] {hans1, hans2};
         }
 
         public string SayHi()
@@ -28,11 +18,9 @@ namespace Server.Services
             return "hi";
         }
 
-        public Hans[] Hanses => hanses;
-
         public void Tick()
         {
-            foreach (var hans in hanses)
+            foreach (var hans in Hanses)
             {
                 ProcessCurrentActivity(hans);
             }

@@ -6,6 +6,7 @@ namespace Server.Services
     public interface IGameService
     {
         string SayHi();
-        Hans[] Hanses { get; }
+        Hans[] Hanses { get; set; }
+        Location[] Locations { get; set; }
     }
 }
