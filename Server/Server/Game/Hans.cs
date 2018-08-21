@@ -4,7 +4,7 @@ namespace Server.Game
 {
     public class Hans
     {
-        private string name;
+        public string Name { get; }
         private int _satiety;
         private int _happy;
         private int _energy;
@@ -34,14 +34,14 @@ namespace Server.Game
 
         public Hans(string name)
         {
-            this.name = name;
+            this.Name = name;
         }
 
         public string Activity { get; set; }
 
         public override string ToString()
         {
-            return $"{nameof(name)}: {name}, {nameof(Satiety)}: {Satiety}, {nameof(Happy)}: {Happy}, {nameof(Energy)}: {Energy}, {nameof(Activity)}: {Activity}";
+            return $"{nameof(Name)}: {Name}, {nameof(Satiety)}: {Satiety}, {nameof(Happy)}: {Happy}, {nameof(Energy)}: {Energy}, {nameof(Activity)}: {Activity}";
         }
     }
 

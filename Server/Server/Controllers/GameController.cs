@@ -6,7 +6,7 @@ namespace Server.Controllers
     
     [Route("api/[controller]")]
     [ApiController]
-    public class GameController : ControllerBase
+    public class GameController : Controller
     {
         private readonly IGameService _gameService;
 
@@ -21,10 +21,16 @@ namespace Server.Controllers
             return _gameService.SayHi();
         }
         
+        [HttpGet("hans/{id}")]
+        public ActionResult<string> GetHans(int id)
+        {
+            return Json(_gameService.Hanses[id]);
+        }
+        
         [HttpGet("hans")]
         public ActionResult<string> GetHanses()
         {
-            return _gameService.Hanses[0].ToString();
+            return Json(_gameService.Hanses);
         }
         
     }
