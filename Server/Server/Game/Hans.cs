@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Reflection.Metadata;
 
 namespace Server.Game
 {
     public class Hans
     {
-        public string Name { get; }
+        private const int StatMin = 0;
+        private const int StatMax = 10;
+        
+        public string Name { get; set; }
         private int _satiety;
         private int _happy;
         private int _energy;
@@ -27,9 +31,9 @@ namespace Server.Game
             set => _energy = Clamp(value);
         }
 
-        private int Clamp(int value)
+        private static int Clamp(int value)
         {
-            return value; //TODO clamp
+            return Math.Max(Math.Min(value, StatMin), StatMax);
         }
 
         public Hans(string name)
@@ -45,69 +49,4 @@ namespace Server.Game
         }
     }
 
-    public class Location
-    {
-        private string name;
-        private LocationFeature[] LocationFeatures;
-
-        public Location(string name, LocationFeature[] locationFeatures)
-        {
-            LocationFeatures = locationFeatures;
-            this.name = name;
-        }
-    }
-
-    //
-    // ACTIVITIES
-    //
-    abstract class Activity
-    {
-        //TODO: do this in c# style
-        public abstract LocationFeature[] GetPrerequisites();
-
-        public bool Valid(Location location)
-        {
-            //TODO check if location contains the required prerequisites
-            return true;
-        }
-
-        public void Run(Hans hans, Location location)
-        {
-            if (Valid(location))
-            {
-                DoRun(hans, location);
-            };
-        }
-
-        protected abstract void DoRun(Hans hans, Location location);
-        
-    }
-
-    class EatActivity : Activity
-    {
-        public override LocationFeature[] GetPrerequisites()
-        {
-            return new[] {LocationFeature.Table};
-        }
-
-        protected override void DoRun(Hans hans, Location location)
-        {
-            hans.Satiety += 10;
-            // location.foodStuffs.remove(1);
-        }
-
-        public override string ToString()
-        {
-            return "EatActivity";
-        }
-    }
-
-    //
-    // Location features
-    //
-    
-    public enum LocationFeature
-    {
-        Table, Bed
-    }
 }

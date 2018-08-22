@@ -11,22 +11,33 @@ namespace GameTest
         
         public GameServiceTest()
         {
-            _gameService = new GameService();
-            
             var locations = new[]
             {
-                new Location("Home", new[] {LocationFeature.Bed}),
-                new Location("Restaurant", new[] {LocationFeature.Table})
+                new Location("Home")
+                {
+                    LocationFeatures = new[] {LocationFeature.Bed}
+                },
+                new Location("Restaurant")
+                {
+                    LocationFeatures = new[] {LocationFeature.Table}
+                },
+                new Location("Playground")
+                {
+                    LocationFeatures = new[] {LocationFeature.Playground}
+                },
             };
             
-            var hans1 = new Hans("Peter");
-            var hans2 = new Hans("Rudolf");
+            var hanses = new[]
+            {
+                new Hans("Peter"),
+                new Hans("Rudolf")
+            };
 
-            var hanses = new[] {hans1, hans2};
-
-            _gameService.Hanses = hanses;
-            _gameService.Locations = locations;
-
+            _gameService = new GameService
+            {
+                Hanses = hanses,
+                Locations = locations
+            };
         }
         
         [Fact]

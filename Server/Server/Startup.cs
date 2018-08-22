@@ -30,22 +30,34 @@ namespace Server
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             
             // add some values while we don't have any persistence yet
-            var gameService = new GameService();
             var locations = new[]
             {
-                new Location("Home", new[] {LocationFeature.Bed}),
-                new Location("Restaurant", new[] {LocationFeature.Table})
+                new Location("Home")
+                {
+                    LocationFeatures = new[] {LocationFeature.Bed}
+                },
+                new Location("Restaurant")
+                {
+                    LocationFeatures = new[] {LocationFeature.Table}
+                },
+                new Location("Playground")
+                {
+                    LocationFeatures = new[] {LocationFeature.Playground}
+                },
             };
             
-            var hans1 = new Hans("Peter");
-            var hans2 = new Hans("Rudolf");
+            var hanses = new[]
+            {
+                new Hans("Peter"),
+                new Hans("Rudolf")
+            };
 
-            var hanses = new[] {hans1, hans2};
 
-            gameService.Hanses = hanses;
-            gameService.Locations = locations;
-
-            services.AddSingleton<IGameService>(gameService);
+            services.AddSingleton<IGameService>(new GameService
+            {
+                Hanses = hanses,
+                Locations = locations
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,9 +70,9 @@ namespace Server
             else
             {
                 app.UseHsts();
+                app.UseHttpsRedirection();
             }
 
-            app.UseHttpsRedirection();
             app.UseMvc();
         }
         
