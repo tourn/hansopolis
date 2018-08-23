@@ -5,8 +5,9 @@ namespace Server.Services
 {
     public interface IGameService
     {
-        string SayHi();
         Hans[] Hanses { get; set; }
         Location[] Locations { get; set; }
+        void Tick();
+        void ScheduleActivity(Hans hans, Activity activity, Location location);
     }
 }

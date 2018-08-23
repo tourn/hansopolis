@@ -48,8 +48,14 @@ namespace Server
             
             var hanses = new[]
             {
-                new Hans("Peter"),
+                new Hans("Peter")
+                {
+                    Location = locations[0]
+                },
                 new Hans("Rudolf")
+                {
+                    Location = locations[0]
+                }
             };
 
 

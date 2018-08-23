@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
+using Server.Game;
 using Server.Services;
 
 namespace Server.Controllers
@@ -15,12 +17,6 @@ namespace Server.Controllers
             _gameService = gameService;
         }
 
-        [HttpGet("hi")]
-        public ActionResult<string> GetHi()
-        {
-            return _gameService.SayHi();
-        }
-        
         [HttpGet("hans/{id}")]
         public ActionResult<string> GetHans(int id)
         {
@@ -32,6 +28,36 @@ namespace Server.Controllers
         {
             return Json(_gameService.Hanses);
         }
+        
+        [HttpPost("hans/{id}/do")]
+        public ActionResult<string> DoActivity(int hansId, [FromBody] DoRequest body)
+        {
+            var hans = _gameService.Hanses[hansId];
+            var activity = mapStringToActivity(body.Activity);
+            var location = _gameService.Locations[body.Location];
+            _gameService.ScheduleActivity(hans, activity, location);
+            return Ok();
+        }
+
+        private Activity mapStringToActivity(String s)
+        {
+            switch (s)
+            {
+                case "eat": return Activity.Eat;
+                case "sleep": return Activity.Sleep;
+                case "play": return Activity.Play;
+            }
+
+            return null;
+        }
+        
+        [HttpPost("tick")]
+        public ActionResult<string> Tick()
+        {
+            _gameService.Tick();
+            return Json(_gameService.Hanses);
+        }
+        
         
     }
 }

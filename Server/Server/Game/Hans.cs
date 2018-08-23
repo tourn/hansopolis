@@ -9,6 +9,8 @@ namespace Server.Game
         private const int StatMax = 10;
         
         public string Name { get; set; }
+        public Activity Activity { get; set; }
+        public Location Location { get; set; }
         private int _satiety;
         private int _happy;
         private int _energy;
@@ -33,15 +35,13 @@ namespace Server.Game
 
         private static int Clamp(int value)
         {
-            return Math.Max(Math.Min(value, StatMin), StatMax);
+            return Math.Min(Math.Max(value, StatMin), StatMax);
         }
 
         public Hans(string name)
         {
             this.Name = name;
         }
-
-        public string Activity { get; set; }
 
         public override string ToString()
         {

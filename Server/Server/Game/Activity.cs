@@ -1,33 +1,60 @@
-﻿using System.Runtime.InteropServices.WindowsRuntime;
+﻿using System;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using static Server.Game.LocationFeature;
 namespace Server.Game
 {
 
-    delegate void UpdateActivity(Hans hans, Location location);
+    //we might make Hans immutable and this function return the updated hans
+    delegate void Update(Hans hans);
 
-    class Activity
+    public class Activity
     {
-        public LocationFeature[] LocationFeatures { get; set; }
-        public UpdateActivity Update { get; set; }
+        private Activity(string name)
+        {
+            Name = name;
+        }
+
+        public LocationFeature[] LocationFeatures { get; set; } = {};
+        private Update Update { get; set; }
+        public string Name { get; }
         
         public bool Valid(Location location)
         {
-            //TODO check if location contains the required prerequisites
-            return true;
+            // at some point we might need to differentiate whether ALL or ONE of the features is required
+            if (LocationFeatures.Length == 0)
+            {
+                return true;
+            }
+
+            foreach (var requiredFeature in LocationFeatures)
+            {
+                if (location.LocationFeatures.Contains(requiredFeature))
+                {
+                    return true;
+                }
+            }
+            
+            return false;
         }
 
-        public void Run(Hans hans, Location location)
+        public void Run(Hans hans)
         {
-            if (Valid(location))
+            if (Valid(hans.Location))
             {
-                Update(hans, location);
-            };
+                Update(hans);
+                hans.Activity = null;
+            }
+            else
+            {
+                //TODO exceptions really aren't the way i want to handle this here
+                throw new Exception("Location is invalid");
+            }
         }
         
-        public static Activity Tick => new Activity
+        public static Activity Tick => new Activity("Tick")
         {
-            LocationFeatures = new[] {Table},
-            Update = (hans, location) =>
+            Update = (hans) =>
             {
                 const int decay = 1;
                 hans.Satiety -= decay;
@@ -35,28 +62,33 @@ namespace Server.Game
                 hans.Energy -= decay;
             }
         };
+
+        public static Activity Move(Location location) => new Activity("Move")
+        {
+            Update = (hans) => { hans.Location = location; }
+        };
         
-        public static Activity Eat => new Activity
+        public static Activity Eat => new Activity("Eat")
         {
             LocationFeatures = new[] {Table},
-            Update = (hans, location) => { hans.Satiety += 10; }
+            Update = (hans) => { hans.Satiety += 10; }
         };
         
-        public static Activity Play => new Activity
+        public static Activity Play => new Activity("Play")
         {
             LocationFeatures = new[] {Playground, Table},
-            Update = (hans, location) => { hans.Happy += 10; }
+            Update = (hans) => { hans.Happy += 10; }
         };
         
-        public static Activity Sleep => new Activity
+        public static Activity Sleep => new Activity("Sleep")
         {
             LocationFeatures = new[] {Bed},
-            Update = (hans, location) => { hans.Energy += 10; }
+            Update = (hans) => { hans.Energy += 10; }
         };
         
-        public static Activity Feint => new Activity
+        public static Activity Feint => new Activity("Feint")
         {
-            Update = (hans, location) =>
+            Update = (hans) =>
             {
                 hans.Energy += 2;
                 hans.Happy -= 5;

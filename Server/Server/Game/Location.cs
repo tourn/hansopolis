@@ -3,7 +3,7 @@
     public class Location
     {
         public string Name { get; set; }
-        public LocationFeature[] LocationFeatures { get; set; }
+        public LocationFeature[] LocationFeatures { get; set; } = { };
 
         public Location(string name)
         {

@@ -9,26 +9,19 @@ namespace Server.Services
         public Location[] Locations { get; set; }
         public Hans[] Hanses { get; set; }
 
-        public GameService()
-        {
-        }
-
-        public string SayHi()
-        {
-            return "hi";
-        }
-
         public void Tick()
         {
             foreach (var hans in Hanses)
             {
-                ProcessCurrentActivity(hans);
+                hans.Activity?.Run(hans);
+                Activity.Tick.Run(hans);
             }
         }
 
-        private void ProcessCurrentActivity(Hans hans)
+        public void ScheduleActivity(Hans hans, Activity activity, Location location)
         {
-            throw new System.NotImplementedException();
+            hans.Activity = activity;
+            hans.Location = location;
         }
     }
 }
