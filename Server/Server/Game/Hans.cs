@@ -1,51 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata;
 
 namespace Server.Game
 {
+    public enum Stat
+    {
+        Satiety, Happy, Energy, Health
+    }
+
+    public class StatDictionary : Dictionary<Stat, double>
+    {
+        private const double StatMin = 0;
+        private const double StatMax = 100;
+        
+        public double this[Stat stat]
+        {
+            get => base[stat];
+            set => base[stat] = Clamp(value);
+        }
+        
+        public static double Clamp(double value)
+        {
+            return Math.Min(Math.Max(value, StatMin), StatMax);
+        }
+
+    }
+    
     public class Hans
     {
-        private const int StatMin = 0;
-        private const int StatMax = 10;
         
         public string Name { get; set; }
 
         public Activity[] Activities => _activities.ToArray();
 
         public Location Location { get; set; }
-        private int _satiety;
-        private int _happy;
-        private int _energy;
+        public StatDictionary Stats { get; set; } = new StatDictionary();
         private Queue<Activity> _activities = new Queue<Activity>();
 
         public Hans(string name)
         {
             this.Name = name;
-        }
-
-        public int Satiety
-        {
-            get => _satiety;
-            set => _satiety = Clamp(value);
-        }
-
-        public int Happy
-        {
-            get => _happy;
-            set => _happy = Clamp(value);
-        }
-
-        public int Energy
-        {
-            get => _energy;
-            set => _energy = Clamp(value);
-        }
-
-        private static int Clamp(int value)
-        {
-            return Math.Min(Math.Max(value, StatMin), StatMax);
+            Stats[Stat.Satiety] = 70;
+            Stats[Stat.Happy] = 70;
+            Stats[Stat.Energy] = 70;
+            Stats[Stat.Health] = 100;
         }
 
         public Activity CurrentActivity =>  _activities.Count > 0 ? _activities.Peek() : Activity.Idle(); 
@@ -82,14 +81,7 @@ namespace Server.Game
                 //TODO log: dropped activity because location is invalid
             }
             CurrentActivity.Run(this);
-            Activity.Decay().Run(this); //running the decay at the end means stats will never be at their maximum. TODO: Think about this.
-            TickActivityDuration();
-        }
-
-        private void TickActivityDuration()
-        {
-            CurrentActivity.Duration -= 1;
-            if (CurrentActivity.Duration <= 0)
+            if (CurrentActivity.TicksLeft <= 0)
             {
                 var dropped = _activities.Dequeue();
                 //TODO log: ended activity
