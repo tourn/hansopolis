@@ -43,9 +43,9 @@ namespace Server.Controllers
         {
             switch (s)
             {
-                case "eat": return Activity.Eat;
-                case "sleep": return Activity.Sleep;
-                case "play": return Activity.Play;
+                case "eat": return Activity.Eat();
+                case "sleep": return Activity.Sleep();
+                case "play": return Activity.Play();
             }
 
             return null;

@@ -18,6 +18,10 @@ namespace Server.Game
         public LocationFeature[] LocationFeatures { get; set; } = {};
         private Update Update { get; set; }
         public string Name { get; }
+        public bool Selectable { get; set; } = true;
+        public bool Cancellable { get; set; } = true;
+        public int Duration { get; set; } = 1;
+            
         
         public bool Valid(Location location)
         {
@@ -40,19 +44,17 @@ namespace Server.Game
 
         public void Run(Hans hans)
         {
-            if (Valid(hans.Location))
-            {
-                Update(hans);
-                hans.Activity = null;
-            }
-            else
-            {
-                //TODO exceptions really aren't the way i want to handle this here
-                throw new Exception("Location is invalid");
-            }
+            Update(hans);
         }
+
+        public static Activity Idle() => new Activity("Idle")
+        {
+            Selectable = false,
+            Duration = 999,
+            Update = hans => { }
+        };
         
-        public static Activity Tick => new Activity("Tick")
+        public static Activity Decay() => new Activity("Tick")
         {
             Update = (hans) =>
             {
@@ -63,31 +65,34 @@ namespace Server.Game
             }
         };
 
-        public static Activity Move(Location location) => new Activity("Move")
+        public static Activity Move(Location location) => new Activity($"Move to {location.Name}")
         {
+            Cancellable = false,
             Update = (hans) => { hans.Location = location; }
         };
         
-        public static Activity Eat => new Activity("Eat")
+        public static Activity Eat() => new Activity("Eat")
         {
             LocationFeatures = new[] {Table},
             Update = (hans) => { hans.Satiety += 10; }
         };
         
-        public static Activity Play => new Activity("Play")
+        public static Activity Play() => new Activity("Play")
         {
             LocationFeatures = new[] {Playground, Table},
             Update = (hans) => { hans.Happy += 10; }
         };
         
-        public static Activity Sleep => new Activity("Sleep")
+        public static Activity Sleep() => new Activity("Sleep")
         {
             LocationFeatures = new[] {Bed},
             Update = (hans) => { hans.Energy += 10; }
         };
         
-        public static Activity Feint => new Activity("Feint")
+        public static Activity Feint() => new Activity("Feint")
         {
+            Selectable = false,
+            Cancellable = false,
             Update = (hans) =>
             {
                 hans.Energy += 2;

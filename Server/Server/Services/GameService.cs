@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Server.Game;
-using static Server.Game.LocationFeature;
+﻿using Server.Game;
 
 namespace Server.Services
 {
@@ -13,15 +11,13 @@ namespace Server.Services
         {
             foreach (var hans in Hanses)
             {
-                hans.Activity?.Run(hans);
-                Activity.Tick.Run(hans);
+                hans.Tick();
             }
         }
 
         public void ScheduleActivity(Hans hans, Activity activity, Location location)
         {
-            hans.Activity = activity;
-            hans.Location = location;
+            hans.AddActivity(activity, location);
         }
     }
 }
