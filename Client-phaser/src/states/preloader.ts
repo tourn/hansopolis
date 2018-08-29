@@ -1,5 +1,6 @@
 import * as Assets from '../assets';
 import * as AssetUtils from '../utils/assetUtils';
+import {Backend} from '../utils/backend';
 
 export default class Preloader extends Phaser.State {
     private preloadBarSprite: Phaser.Sprite = null;
@@ -21,12 +22,18 @@ export default class Preloader extends Phaser.State {
 
         this.game.load.setPreloadSprite(this.preloadBarSprite);
 
-        AssetUtils.Loader.loadAllAssets(this.game, this.waitForSoundDecoding, this);
+        // TODO batch these smartly with Promise.all
+        AssetUtils.Loader.loadAllAssets(this.game, this.loadMapFromServer, this);
+
     }
 
-    private waitForSoundDecoding(): void {
-        AssetUtils.Loader.waitForSoundDecoding(this.startGame, this);
+    private loadMapFromServer() {
+        Backend.loadLocations().then(this.startGame.bind(this));
     }
+
+    // private waitForSoundDecoding(): void {
+    //     AssetUtils.Loader.waitForSoundDecoding(this.startGame, this);
+    // }
 
     private startGame(): void {
         this.game.camera.onFadeComplete.addOnce(this.loadTitle, this);

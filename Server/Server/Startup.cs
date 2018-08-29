@@ -27,20 +27,21 @@ namespace Server
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             
             // add some values while we don't have any persistence yet
             var locations = new[]
             {
-                new Location("Home")
+                new Location("Home", new Coordinates(2,2))
                 {
                     LocationFeatures = new[] {LocationFeature.Bed}
                 },
-                new Location("Restaurant")
+                new Location("Restaurant", new Coordinates(4,4))
                 {
                     LocationFeatures = new[] {LocationFeature.Table}
                 },
-                new Location("Playground")
+                new Location("Playground", new Coordinates(6,2))
                 {
                     LocationFeatures = new[] {LocationFeature.Playground}
                 },
@@ -78,6 +79,8 @@ namespace Server
                 app.UseHsts();
                 app.UseHttpsRedirection();
             }
+
+            app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
             app.UseMvc();
         }

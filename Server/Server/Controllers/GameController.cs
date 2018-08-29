@@ -29,6 +29,12 @@ namespace Server.Controllers
             return Json(_gameService.Hanses);
         }
         
+        [HttpGet("location")]
+        public ActionResult<string> GetLocations()
+        {
+            return Json(_gameService.Locations);
+        }
+        
         [HttpPost("hans/{id}/do")]
         public ActionResult<string> DoActivity(int hansId, [FromBody] DoRequest body)
         {

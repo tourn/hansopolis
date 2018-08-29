@@ -1,4 +1,5 @@
 import * as Assets from '../assets';
+import {Backend} from '../utils/backend';
 
 
 
@@ -14,53 +15,18 @@ const hanses = [
     {
         name: 'Hans',
         face: 'o,O',
-        location: {x: 4, y: 4}
+        coordinates: {x: 4, y: 5}
     },
     {
         name: 'Peter',
         face: '>.O',
-        location: {x: 6, y: 8}
-    },
-];
-
-const poi = [
-    {
-        name: 'Restaurant',
-        location: {x: 4, y: 5},
-        tile: TILE_HOUSE,
-        actions: ['eat', 'carouse']
-    },
-    {
-        name: 'Home',
-        location: {x: 9, y: 9},
-        tile: TILE_HOUSE,
-        actions: ['sleep']
-    },
-    {
-        name: 'Forest',
-        location: {x: 2, y: 7},
-        tile: TILE_HOUSE,
-        actions: ['chop wood']
+        coordinates: {x: 6, y: 8}
     },
 ];
 
 const Hanses = {
     at(x: number, y: number) {
-        return hanses.filter(h => h.location.x === x && h.location.y === y)[0];
-    }
-};
-
-const Locations = {
-    at(x: number, y: number) {
-        const l = poi.filter(h => h.location.x === x && h.location.y === y)[0];
-        if (l) {
-            return l;
-        } else {
-            return {
-                name: 'Nothing',
-                actions: []
-            };
-        }
+        return hanses.filter(h => h.coordinates.x === x && h.coordinates.y === y)[0];
     }
 };
 
@@ -82,15 +48,15 @@ export default class World extends Phaser.State {
             }
         }
 
-        poi.forEach(p => {
-            map.putTile(p.tile, p.location.x, p.location.y, locationLayer);
+        Backend.locations.forEach(p => {
+            map.putTile(TILE_HOUSE, p.coordinates.x, p.coordinates.y, locationLayer);
         });
 
         const hansLayer = map.createBlankLayer('hanses', 10, 10, TILE_WIDTH, TILE_WIDTH);
         hansLayer.scale.set(SCALE);
 
         hanses.forEach(hans => {
-            map.putTile(TILE_HANS, hans.location.x, hans.location.y, hansLayer);
+            map.putTile(TILE_HANS, hans.coordinates.x, hans.coordinates.y, hansLayer);
         });
 
         const marker = this.game.add.graphics();
@@ -129,7 +95,7 @@ export default class World extends Phaser.State {
                 return;
             }
 
-            const location = Locations.at(x, y);
+            const location = Backend.locationAt(x, y);
             if (location) {
                 infoBox.displayLocation(location);
                 return;
@@ -171,8 +137,13 @@ class InfoBox {
     displayLocation(location) {
         this.clear();
         this.infoText.setText(location.name);
+        const locationId = Backend.locations.indexOf(location);
         location.actions.forEach(a => {
-            this.addButton(a, () => console.log('run action: ', a));
+            const callback = () => {
+                console.log('queue activity', a);
+                Backend.queueActivity(0, locationId, a);
+            };
+            this.addButton(a, callback);
         });
     }
 
