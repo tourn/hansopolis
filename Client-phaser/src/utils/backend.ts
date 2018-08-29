@@ -25,9 +25,29 @@ class BackendImpl {
         } else {
             return {
                 name: 'Nothing',
-                actions: []
+                activities: []
             };
         }
+    }
+
+    hanses = [];
+    loadHanses() {
+        return api.get('hans')
+            .then(res => {
+                console.log('Loaded hanses', res.data);
+                this.hanses = res.data;
+                return res.data;
+            })
+            .catch(e => {
+                console.error('error loading hanses', e);
+            });
+    }
+    hansAt(x: number, y: number) {
+        return this.hanses.filter(h => h.location.coordinates.x === x && h.location.coordinates.y === y)[0];
+    }
+
+    tick() {
+        return api.post('tick');
     }
 
     queueActivity(hansId: number, locationId: number, activity: string) {

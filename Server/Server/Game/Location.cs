@@ -18,7 +18,7 @@
         public LocationFeature[] LocationFeatures { get; set; } = { };
         public Coordinates Coordinates { get; }
 
-        public string[] Actions
+        public string[] Activities
         {
             get
             {

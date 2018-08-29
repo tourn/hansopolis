@@ -23,12 +23,16 @@ export default class Preloader extends Phaser.State {
         this.game.load.setPreloadSprite(this.preloadBarSprite);
 
         // TODO batch these smartly with Promise.all
-        AssetUtils.Loader.loadAllAssets(this.game, this.loadMapFromServer, this);
+        const loadAssets = new Promise(resolve => {
+            AssetUtils.Loader.loadAllAssets(this.game, resolve, this);
+        });
 
-    }
+        Promise.all([
+            loadAssets,
+            Backend.loadLocations(),
+            Backend.loadHanses()
+        ]).then(this.startGame.bind(this));
 
-    private loadMapFromServer() {
-        Backend.loadLocations().then(this.startGame.bind(this));
     }
 
     // private waitForSoundDecoding(): void {

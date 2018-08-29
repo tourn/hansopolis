@@ -55,7 +55,7 @@ namespace Server
                 },
                 new Hans("Rudolf")
                 {
-                    Location = locations[0]
+                    Location = locations[1]
                 }
             };
 

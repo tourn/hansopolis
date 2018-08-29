@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace Server.Game
 {
@@ -35,6 +36,7 @@ namespace Server.Game
         public Activity[] Activities => _activities.ToArray();
 
         public Location Location { get; set; }
+        
         public StatDictionary Stats { get; set; } = new StatDictionary();
         private Queue<Activity> _activities = new Queue<Activity>();
 
@@ -47,6 +49,7 @@ namespace Server.Game
             Stats[Stat.Health] = 100;
         }
 
+        [JsonIgnore]
         public Activity CurrentActivity =>  _activities.Count > 0 ? _activities.Peek() : Activity.Idle(); 
 
         public void AddActivity(Activity activity, Location location)
