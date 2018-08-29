@@ -27,17 +27,20 @@ const poi = [
     {
         name: 'Restaurant',
         location: {x: 4, y: 5},
-        tile: TILE_HOUSE
+        tile: TILE_HOUSE,
+        actions: ['eat', 'carouse']
     },
     {
         name: 'Home',
         location: {x: 9, y: 9},
-        tile: TILE_HOUSE
+        tile: TILE_HOUSE,
+        actions: ['sleep']
     },
     {
         name: 'Forest',
         location: {x: 2, y: 7},
-        tile: TILE_HOUSE
+        tile: TILE_HOUSE,
+        actions: ['chop wood']
     },
 ];
 
@@ -54,7 +57,8 @@ const Locations = {
             return l;
         } else {
             return {
-                name: 'Nothing'
+                name: 'Nothing',
+                actions: []
             };
         }
     }
@@ -64,6 +68,7 @@ export default class World extends Phaser.State {
 
     public create(): void {
         const map = this.game.add.tilemap();
+        const mapBounds = new Phaser.Rectangle(0, 0, 10 * TILE_WIDTH, 10 * TILE_WIDTH);
 
         map.addTilesetImage(Assets.Images.TilesetsCatastrophiTiles16.getName(), undefined, TILE_WIDTH, TILE_WIDTH);
         const locationLayer = map.create('locations', 10, 10, TILE_WIDTH, TILE_WIDTH);
@@ -93,47 +98,92 @@ export default class World extends Phaser.State {
         marker.drawRect(0, 0, TILE_WIDTH * SCALE, TILE_WIDTH * SCALE);
 
         function updateMarker() {
+            const x = this.game.input.activePointer.worldX;
+            const y = this.game.input.activePointer.worldY;
 
-            const tileX = hansLayer.getTileX(this.game.input.activePointer.worldX);
-            const tileY = hansLayer.getTileY(this.game.input.activePointer.worldY);
-            marker.x = tileX * TILE_WIDTH;
-            marker.y = tileY * TILE_WIDTH;
+            if (mapBounds.contains(x, y)) {
+                const tileX = hansLayer.getTileX(x);
+                const tileY = hansLayer.getTileY(y);
+                marker.x = tileX * TILE_WIDTH;
+                marker.y = tileY * TILE_WIDTH;
 
-            updateInfo(tileX, tileY);
 
-            // if (game.input.mousePointer.isDown)
-            // {
-            //     map.putTile(currentTile, currentLayer.getTileX(marker.x), currentLayer.getTileY(marker.y), currentLayer);
-            //     // map.fill(currentTile, currentLayer.getTileX(marker.x), currentLayer.getTileY(marker.y), 4, 4, currentLayer);
-            // }
+                if (this.game.input.mousePointer.isDown) {
+                    updateInfo(tileX, tileY);
+                }
+
+            }
 
         }
 
         this.game.input.addMoveCallback(updateMarker, this);
 
-        const bounds = new Phaser.Rectangle(TILE_WIDTH * SCALE * 10, 0, 200, TILE_WIDTH * SCALE * 10);
-        const graphics = this.game.add.graphics(bounds.x, bounds.y);
-        graphics.beginFill(0x000077);
-        graphics.drawRect(0, 0, bounds.width, bounds.height);
+        // const bounds = new Phaser.Rectangle(TILE_WIDTH * SCALE * 10, 0, 200, TILE_WIDTH * SCALE * 10);
+        const infoBox = new InfoBox(this.game, TILE_WIDTH * SCALE * 10, 0);
 
-        const infoText = this.game.add.text(bounds.x, bounds.y, 'info:');
 
         function updateInfo(x, y) {
             const hans = Hanses.at(x, y);
             if (hans) {
-                infoText.text = `${hans.name}\n${hans.face}`;
+                infoBox.displayHans(hans);
                 return;
             }
 
             const location = Locations.at(x, y);
             if (location) {
-                infoText.text = location.name;
+                infoBox.displayLocation(location);
                 return;
             }
-
-            infoText.text = '???';
         }
 
 
+    }
+}
+
+class InfoBox {
+    private infoText: Phaser.Text;
+    private buttons: Phaser.Button[] = [];
+    private texts: Phaser.Text[] = [];
+    private bounds: Phaser.Rectangle;
+
+    constructor(private game, private x, private y) {
+        this.bounds = new Phaser.Rectangle(x, y, 200, TILE_WIDTH * SCALE * 10);
+        const graphics = this.game.add.graphics(this.bounds.x, this.bounds.y);
+        graphics.beginFill(0x00483B);
+        graphics.drawRect(0, 0, this.bounds.width, this.bounds.height);
+
+        this.infoText = this.game.add.text(this.bounds.x, this.bounds.y, '...');
+    }
+
+    clear() {
+        this.infoText.setText('');
+        this.buttons.forEach(b => b.destroy());
+        this.buttons = [];
+        this.texts.forEach(t => t.destroy());
+        this.texts = [];
+    }
+
+    displayHans(hans) {
+        this.clear();
+        this.infoText.setText(`${hans.name}\n${hans.face}`);
+    }
+
+    displayLocation(location) {
+        this.clear();
+        this.infoText.setText(location.name);
+        location.actions.forEach(a => {
+            this.addButton(a, () => console.log('run action: ', a));
+        });
+    }
+
+    addButton(text, callback) {
+        const buttonHeight = 32;
+        const x = this.bounds.x;
+        const y = this.bounds.y + this.infoText.height + this.buttons.length * buttonHeight;
+        const button = this.game.add.button(x, y, Assets.Spritesheets.SpritesheetsButtonHorizontal64322.getName(), callback, this, 1, 0);
+        this.buttons.push(button);
+
+        const buttonText = this.game.add.text(x, y, text);
+        this.texts.push(buttonText);
     }
 }

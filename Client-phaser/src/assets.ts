@@ -14,6 +14,16 @@ export namespace Images {
 }
 
 export namespace Spritesheets {
+    export class SpritesheetsButtonHorizontal64322 {
+        static getName(): string { return 'button-horizontal.[64,32,2,0,0]'; }
+
+        static getPNG(): string { return require('assets/spritesheets/button-horizontal.[64,32,2,0,0].png'); }
+        static getFrameWidth(): number { return 64; }
+        static getFrameHeight(): number { return 32; }
+        static getFrameMax(): number { return 2; }
+        static getMargin(): number { return 0; }
+        static getSpacing(): number { return 0; }
+    }
     export class SpritesheetsMetalslugMummy374518 {
         static getName(): string { return 'metalslug_mummy.[37,45,18,0,0]'; }
 
